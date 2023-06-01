@@ -1,3 +1,5 @@
+#include "Pixel.cpp"
+
 class RGBPixel : public Pixel 
 {
     public:
@@ -10,4 +12,6 @@ class RGBPixel : public Pixel
         void setRed(int r);
         void setGreen(int g);
         void setBlue(int b);
+        
+        int colorComb = 0;      // i keep in each byte the colors
 };

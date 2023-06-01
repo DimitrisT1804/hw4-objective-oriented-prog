@@ -1,4 +1,5 @@
 //
+#include "Pixel.cpp"
 class GSCPixel : public Pixel
 {
     public:
