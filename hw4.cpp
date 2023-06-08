@@ -50,12 +50,12 @@ class Image
         void setHeight(int height) { this->height = height; }
         void setMaxLuminocity(int lum) { this->max_luminocity = lum; }
 
-//        virtual Image& operator += (int times) = 0;
-//        virtual Image& operator *= (double factor) = 0;
- //       virtual Image& operator !() = 0;
- //       virtual Image& operator ~() = 0;
- //       virtual Image& operator *() = 0;  
- //       virtual Pixel& getPixel(int row, int col) const = 0;  
+       virtual Image& operator += (int times) = 0;
+       virtual Image& operator *= (double factor) = 0;
+       virtual Image& operator !() = 0;
+       virtual Image& operator ~() = 0;
+       virtual Image& operator *() = 0;  
+       virtual Pixel& getPixel(int row, int col) const = 0;  
         friend std::ostream& operator << (std::ostream& out, Image& image);
 
 
@@ -84,14 +84,81 @@ class Image
         }
         delete[] myImage;
     }
- 
-    
 };
+
+class GSCImage : public Image 
+{
+    public:
+        GSCImage();
+        GSCImage(const GSCImage& img);
+        GSCImage(const RGBImage& grayscaled);
+        GSCImage(std::istream& stream);
+        ~GSCImage();
+
+        GSCPixel ** currentImage;   // the array of current image
+
+        GSCImage& operator = (const GSCImage& img);
+
+        virtual Image& operator += (int ) override;
+        virtual Image& operator *= (double factor) override;
+        virtual Image& operator ! () override;
+        virtual Image& operator ~ () override;
+        virtual Image& operator * () override;
+
+        virtual Pixel& getPixel(int row, int col) const override;
+        friend std::ostream& operator << (std::ostream& out, Image& image) ;
+
+        // implementations
+        Image& Image::operator+= (int times)
+        {
+            
+        }
+};
+
+
+
+Image* readNetpbmImage(const char* filename)
+{
+    ifstream f (filename);
+    if(!f.is_open())
+    {
+        std::cout << "[ERROR] Unable to open " << filename << std::endl;
+    }
+    Image* img_ptr = nullptr;
+    string type;
+
+    if(f.good() && !f.eof())
+        f >> type;
+    if(!type.compare("P3"))
+    {
+        img_ptr = new RGBImage(f);
+    }
+    else if(!type.compare("P2"))
+    {
+        img_ptr = new GSCImage(f);
+    }
+    else if(f.is_open())
+    {
+        std::cout << "[ERROR] Invalid file format" << std::endl;
+    }
+    return img_ptr;
+}
 
 
 int main()
 {
     Image kati(100, 50);
+    char selection = ' ';
+
+    while (selection != 'q')
+    {
+
+        std::cout << "i <filename> as <$token>" << endl;
+        std::cout << "e <$token> as <filename>" << endl;
+        std::cin >> selection;
+
+    }
+    
 
     return 0;
 
