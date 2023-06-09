@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+
 using namespace std;
 // #include "Image.cpp"
 
@@ -89,17 +91,38 @@ class Image
 class GSCImage : public Image 
 {
     public:
-        GSCImage();
-        GSCImage(const GSCImage& img);
-        GSCImage(const RGBImage& grayscaled);
+        GSCPixel** currentImage;   // the array of current image
+        GSCImage() = default;
+
+        GSCImage(const GSCImage& img) : Image(3,2)
+        {
+            height = img.height;
+            width = img.width;
+
+            currentImage = new GSCPixel* [height];
+
+            for(int i = 0; i < height; i++)
+            {
+                currentImage[i] = new GSCPixel[width];
+            }
+        }
+        //GSCImage(const RGBImage& grayscaled);
         GSCImage(std::istream& stream);
         ~GSCImage();
 
-        GSCPixel ** currentImage;   // the array of current image
 
         GSCImage& operator = (const GSCImage& img);
 
-        virtual Image& operator += (int ) override;
+        virtual Image& operator += (int ) override
+        {
+            for(int i = 0; i < height; i++)
+            {
+                for(int j = 0; j < width; j++)
+                {
+
+                }
+            }
+        }
         virtual Image& operator *= (double factor) override;
         virtual Image& operator ! () override;
         virtual Image& operator ~ () override;
@@ -109,10 +132,20 @@ class GSCImage : public Image
         friend std::ostream& operator << (std::ostream& out, Image& image) ;
 
         // implementations
-        Image& Image::operator+= (int times)
-        {
-            
-        }
+
+
+        // Image& Image::operator+= (int times)
+        // {
+        //     for(int i = 0; i < times; i++)
+        //     {
+        //         for(int j = 0; j < )
+        //     }
+        // }
+
+        // GSCImage(std::istream& stream)
+        // {
+
+        // }
 };
 
 
@@ -131,7 +164,7 @@ Image* readNetpbmImage(const char* filename)
         f >> type;
     if(!type.compare("P3"))
     {
-        img_ptr = new RGBImage(f);
+        //img_ptr = new RGBImage(f);
     }
     else if(!type.compare("P2"))
     {
@@ -147,7 +180,7 @@ Image* readNetpbmImage(const char* filename)
 
 int main()
 {
-    Image kati(100, 50);
+    //Image kati(100, 50);
     char selection = ' ';
 
     while (selection != 'q')
@@ -156,6 +189,14 @@ int main()
         std::cout << "i <filename> as <$token>" << endl;
         std::cout << "e <$token> as <filename>" << endl;
         std::cin >> selection;
+
+        switch(selection)
+        {
+            case 'a':
+            {
+                readNetpbmImage("./autolab-photos/photo/2x3.pgm");
+            }
+        }
 
     }
     
