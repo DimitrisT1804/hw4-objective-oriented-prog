@@ -75,10 +75,9 @@ class Image
         }
 
         // na thimitho na diagrapso tin mnimi pou desmevoun
-        
     }
 
-    ~Image()
+    virtual ~Image()
     {
         for (int i = 0; i < height; i++)
         {
@@ -107,19 +106,29 @@ class GSCImage : public Image
             }
         }
         //GSCImage(const RGBImage& grayscaled);
-        GSCImage(std::istream& stream);
+        GSCImage(std::istream& stream) : Image(3, 2)
+        {
+            string word;
+
+            while(!stream.eof())
+            {
+                stream >> word;
+                cout << word << endl;
+            }
+        }
+
         ~GSCImage();
 
 
         GSCImage& operator = (const GSCImage& img);
 
-        virtual Image& operator += (int ) override
+        virtual Image& operator += (int times) override
         {
             for(int i = 0; i < height; i++)
             {
                 for(int j = 0; j < width; j++)
                 {
-
+                    currentImage[i][j] = currentImage[j][i]
                 }
             }
         }
@@ -129,7 +138,7 @@ class GSCImage : public Image
         virtual Image& operator * () override;
 
         virtual Pixel& getPixel(int row, int col) const override;
-        friend std::ostream& operator << (std::ostream& out, Image& image) ;
+        friend std::ostream& operator << (std::ostream& out, Image& image);
 
         // implementations
 
