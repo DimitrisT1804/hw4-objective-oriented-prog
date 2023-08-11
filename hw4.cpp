@@ -6,7 +6,8 @@ using namespace std;
 
 class Pixel
 {
-
+    public:
+        int pixel_value = 0;    // keep the value of pixel
 };
 
 class RGBPixel : public Pixel 
@@ -33,7 +34,12 @@ class GSCPixel : public Pixel
         GSCPixel(const GSCPixel& p);
         GSCPixel(unsigned char value);
         unsigned char getValue();
-        void setValue(unsigned char value);   
+        void setValue(unsigned char value);
+
+        void setValue(int value)
+        {
+            pixel_value = value;
+        }   
 };
 
 class Image 
@@ -62,38 +68,39 @@ class Image
 
 
     // constuctor
-    Image(int width, int height)
-    {  
-        this->width = width;
-        this->height = height;
+    // Image(int width, int height)
+    // {  
+    //     this->width = width;
+    //     this->height = height;
 
-        myImage = new Pixel* [height];
+    //     myImage = new Pixel* [height];
 
-        for(int i = 0; i < height; i++)
-        {
-            myImage[i] = new Pixel[width];
-        }
+    //     for(int i = 0; i < height; i++)
+    //     {
+    //         myImage[i] = new Pixel[width];
+    //     }
 
-        // na thimitho na diagrapso tin mnimi pou desmevoun
-    }
+    //     // na thimitho na diagrapso tin mnimi pou desmevoun
+    // }
 
-    virtual ~Image()
-    {
-        for (int i = 0; i < height; i++)
-        {
-            delete[] myImage[i];
-        }
-        delete[] myImage;
-    }
+    // virtual ~Image()
+    // {
+    //     for (int i = 0; i < height; i++)
+    //     {
+    //         delete[] myImage[i];
+    //     }
+    //     delete[] myImage;
+    // }
 };
 
 class GSCImage : public Image 
 {
     public:
         GSCPixel** currentImage;   // the array of current image
+        int counter = 0;
         GSCImage() = default;
 
-        GSCImage(const GSCImage& img) : Image(3,2)
+        GSCImage(const GSCImage& img)
         {
             height = img.height;
             width = img.width;
@@ -106,15 +113,55 @@ class GSCImage : public Image
             }
         }
         //GSCImage(const RGBImage& grayscaled);
-        GSCImage(std::istream& stream) : Image(3, 2)
+        GSCImage(std::istream& stream)
         {
             string word;
+            int value = 0;
+            int i = 0, j = 0;
 
             while(!stream.eof())
             {
                 stream >> word;
-                cout << word << endl;
+                counter++;
+                if(counter == 1)    // get width
+                {
+                    width = stoi(word);
+                    currentImage = new GSCPixel* [width];
+                }
+                else if(counter == 2)   // get height
+                {
+                    height = stoi(word);
+                    for(int i = 0; i < width; i++)
+                    {
+                        currentImage[i] = new GSCPixel[height];
+                    }
+                }
+                else if(counter == 3)   // get max_luminocity
+                {
+                    max_luminocity = stoi(word);
+                }
+                else    // it is the value of current pixel
+                {
+                    /* a way to add the value in each pixel, it works!*/
+                    value = stoi(word);
+                    currentImage[i][j].setValue(value);
+                    if(j >= height-1)
+                    {
+                        i++;
+                        j = 0;
+                        if(i == width)
+                        {
+                            i = 0;
+                        }
+                    }
+                    else
+                    {
+                        j++;
+                    }
+                }
+                //cout << word << endl;
             }
+            counter = 0;
         }
 
         ~GSCImage();
@@ -124,21 +171,40 @@ class GSCImage : public Image
 
         virtual Image& operator += (int times) override
         {
-            for(int i = 0; i < height; i++)
-            {
-                for(int j = 0; j < width; j++)
-                {
-                    currentImage[i][j] = currentImage[j][i]
-                }
-            }
+            // currentImage
+            // for(int i = 0; i < height; i++)
+            // {
+            //     for(int j = 0; j < width; j++)
+            //     {
+            //         currentImage[i][j] = currentImage[j][i];
+            //     }
+            // }
         }
-        virtual Image& operator *= (double factor) override;
-        virtual Image& operator ! () override;
-        virtual Image& operator ~ () override;
-        virtual Image& operator * () override;
+        virtual Image& operator *= (double factor) override
+        {
 
-        virtual Pixel& getPixel(int row, int col) const override;
-        friend std::ostream& operator << (std::ostream& out, Image& image);
+        }
+        virtual Image& operator ! () override
+        {
+
+        }
+        virtual Image& operator ~ () override
+        {
+
+        }
+        virtual Image& operator * () override
+        {
+
+        }
+
+        virtual Pixel& getPixel(int row, int col) const override
+        {
+            return currentImage[row][col];
+        }
+        friend std::ostream& operator << (std::ostream& out, Image& image)
+        {
+
+        }
 
         // implementations
 
@@ -191,6 +257,8 @@ int main()
 {
     //Image kati(100, 50);
     char selection = ' ';
+    Image* currentImage;
+    string out_file;
 
     while (selection != 'q')
     {
@@ -203,7 +271,42 @@ int main()
         {
             case 'a':
             {
-                readNetpbmImage("./autolab-photos/photo/2x3.pgm");
+                currentImage = readNetpbmImage("./autolab-photos/photo/ein.pgm");
+                printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
+            }
+
+            case 'b' :
+            {
+                for(int i = 0; i < currentImage->getWidth(); i++)
+                {
+                    for (int j = 0; j < currentImage->getHeight(); j++)
+                    {
+                        printf("Pixel is: %d\n", currentImage->getPixel(i, j).pixel_value);
+                    }
+                }
+
+                // Generate the output file with pgm format
+                cin >> out_file;
+                ofstream myfile(out_file.c_str());
+                if(!myfile.is_open())
+                {
+                    cout << "Unable to open file " << out_file;
+                    return -1; 
+                }
+
+                myfile << "P2" << endl;
+                myfile << to_string(currentImage->getWidth()) << " ";
+                myfile << to_string(currentImage->getHeight()) << " ";
+                myfile << to_string(currentImage->getMaxLuminocity()) << endl;
+
+                for(int i = 0; i < currentImage->getWidth(); i++)
+                {
+                    for (int j = 0; j < currentImage->getHeight(); j++)
+                    {
+                        myfile << to_string(currentImage->getPixel(i, j).pixel_value) << endl;
+                    }
+                }
+
             }
         }
 
