@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 // #include "Image.cpp"
@@ -33,6 +34,11 @@ class GSCPixel : public Pixel
         GSCPixel() = default;
         GSCPixel(const GSCPixel& p);
         GSCPixel(unsigned char value);
+        ~GSCPixel()
+        {
+
+        }
+
         unsigned char getValue();
         void setValue(unsigned char value);
 
@@ -64,7 +70,7 @@ class Image
        virtual Image& operator ~() = 0;
        virtual Image& operator *() = 0;  
        virtual Pixel& getPixel(int row, int col) const = 0;  
-        friend std::ostream& operator << (std::ostream& out, Image& image);
+       friend std::ostream& operator << (std::ostream& out, Image& image);
 
 
     // constuctor
@@ -91,6 +97,10 @@ class Image
     //     }
     //     delete[] myImage;
     // }
+    virtual ~Image()
+    {
+
+    }
 };
 
 class GSCImage : public Image 
@@ -164,7 +174,15 @@ class GSCImage : public Image
             counter = 0;
         }
 
-        ~GSCImage();
+        ~GSCImage()
+        {
+           // free(currentImage);
+            for(int i = 0; i < width; i++)
+            {
+                delete[] currentImage[i];
+            }
+           delete[] currentImage;
+        }
 
 
         GSCImage& operator = (const GSCImage& img);
@@ -218,7 +236,7 @@ class GSCImage : public Image
         // }
 
         // GSCImage(std::istream& stream)
-        // {
+        // {~Token()
 
         // }
 };
@@ -229,10 +247,20 @@ class Token
         string name;
         Image* ptr;
     public:
-        Token(const string = "", Image* = nullptr);
-        ~Token();
+        Token(const string& token_name = "", Image* image_ptr = nullptr)
+        {
+            this->name = token_name;
+            this->ptr = image_ptr;
+        }
+        ~Token()
+        {
+
+        }
         string getName() const;
-        Image*  getPtr() const;
+        Image*  getPtr() const
+        {
+            return ptr;
+        }
         void setName(const string& );
         void setPtr(Image* ptr);
 };
@@ -273,15 +301,18 @@ int main()
     char selection = ' ';
     Image* currentImage;
     string out_file;
-    Token **array = NULL;
-    int array_size = 0;
+    //Token **array = NULL;
+    //int array_size = 0;
+    vector<Token> array_token;
+    string token_name = NULL;
+    string filename = NULL;
 
-    array = (Token **) malloc(sizeof(Token));
-    array_size++;
+
+    //array = (Token **) malloc(sizeof(Token));
+    //array_size++;
 
     while (selection != 'q')
     {
-
         std::cout << "i <filename> as <$token>" << endl;
         std::cout << "e <$token> as <filename>" << endl;
         std::cin >> selection;
@@ -291,11 +322,16 @@ int main()
         {
             case 'a':
             {
+                cin >> token_name;
                 currentImage = readNetpbmImage("./autolab-photos/photo/ein.pgm");
                 printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
-                
-                array = (Token *) realloc(array, array_size*sizeof(Token));
-                Token* Image_token = new Token("kati", currentImage);
+
+                //array = (Token *) realloc(array, array_size*sizeof(Token));
+                //Token* Image_token = new Token("kati", currentImage);
+
+                /*New version for array*/
+                array_token.push_back(Token("kati", currentImage));
+
 
 
                 break;
@@ -351,7 +387,9 @@ int main()
         }
 
     }
-    
+    delete array_token[0].getPtr();
+    array_token.erase(array_token.begin());
+
 
     return 0;
 
