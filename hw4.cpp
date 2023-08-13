@@ -223,6 +223,20 @@ class GSCImage : public Image
         // }
 };
 
+class Token
+{
+    private:
+        string name;
+        Image* ptr;
+    public:
+        Token(const string = "", Image* = nullptr);
+        ~Token();
+        string getName() const;
+        Image*  getPtr() const;
+        void setName(const string& );
+        void setPtr(Image* ptr);
+};
+
 
 
 Image* readNetpbmImage(const char* filename)
@@ -259,6 +273,11 @@ int main()
     char selection = ' ';
     Image* currentImage;
     string out_file;
+    Token **array = NULL;
+    int array_size = 0;
+
+    array = (Token **) malloc(sizeof(Token));
+    array_size++;
 
     while (selection != 'q')
     {
@@ -266,6 +285,7 @@ int main()
         std::cout << "i <filename> as <$token>" << endl;
         std::cout << "e <$token> as <filename>" << endl;
         std::cin >> selection;
+        // std::cin.ignore();
 
         switch(selection)
         {
@@ -273,10 +293,21 @@ int main()
             {
                 currentImage = readNetpbmImage("./autolab-photos/photo/ein.pgm");
                 printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
+                
+                array = (Token *) realloc(array, array_size*sizeof(Token));
+                Token* Image_token = new Token("kati", currentImage);
+
+
+                break;
             }
 
-            case 'b' :
+            case 'b' :  
             {
+                if(currentImage == NULL)
+                {
+                    cin >> out_file;
+                    break;
+                }
                 for(int i = 0; i < currentImage->getWidth(); i++)
                 {
                     for (int j = 0; j < currentImage->getHeight(); j++)
@@ -286,8 +317,10 @@ int main()
                 }
 
                 // Generate the output file with pgm format
-                cin >> out_file;
-                ofstream myfile(out_file.c_str());
+                //std::cin.ignore(256, '\n');
+                std::cin >> out_file;
+                //getline(cin, out_file);
+                ofstream myfile(out_file);
                 if(!myfile.is_open())
                 {
                     cout << "Unable to open file " << out_file;
@@ -307,6 +340,13 @@ int main()
                     }
                 }
 
+                break;
+
+            }
+
+            default:
+            {
+                break;
             }
         }
 
