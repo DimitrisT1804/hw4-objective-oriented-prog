@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string.h>
+#include <filesystem>
 
 using namespace std;
 // #include "Image.cpp"
@@ -256,7 +258,10 @@ class Token
         {
 
         }
-        string getName() const;
+        string getName() const
+        {
+            return name;
+        }
         Image*  getPtr() const
         {
             return ptr;
@@ -294,6 +299,17 @@ Image* readNetpbmImage(const char* filename)
     return img_ptr;
 }
 
+long unsigned int checkToken(string Token_name, vector <Token> array_token)
+{
+    long unsigned int i;
+    for(i = 0; i < array_token.size(); i++)
+    {
+        if( strcmp(array_token[i].getName().c_str(), Token_name.c_str()) == 0)
+            break;    // found
+    }
+    return i;   // not exist!
+}
+
 
 int main()
 {
@@ -304,8 +320,10 @@ int main()
     //Token **array = NULL;
     //int array_size = 0;
     vector<Token> array_token;
-    string token_name = NULL;
-    string filename = NULL;
+    string token_name;
+    string filename;
+    string as;  // just to ignore a character
+    long unsigned int array_pos = -1;
 
 
     //array = (Token **) malloc(sizeof(Token));
@@ -322,62 +340,131 @@ int main()
         {
             case 'a':
             {
+                cin >> filename;
+                cin >> as;
                 cin >> token_name;
-                currentImage = readNetpbmImage("./autolab-photos/photo/ein.pgm");
+
+                currentImage = readNetpbmImage(filename.c_str());
                 printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
 
                 //array = (Token *) realloc(array, array_size*sizeof(Token));
                 //Token* Image_token = new Token("kati", currentImage);
 
                 /*New version for array*/
-                array_token.push_back(Token("kati", currentImage));
+                if(array_token.size() != 0)
+                {
+                    if(checkToken(token_name, array_token) != array_token.size())
+                    {
+                        cout << "[ERROR] Token " << token_name << " exists!" << endl;
+                        break;
+                    }
+                }
+                //else
+                //{
+                    array_token.push_back(Token(token_name, currentImage));
 
-
+                    cout << "[OK] Import " << token_name << endl;
+                //}
 
                 break;
             }
 
-            case 'b' :  
+            case 'e' :  
             {
-                if(currentImage == NULL)
+                cin >> token_name;
+                cin >> as;
+                cin >> out_file;
+
+                for(array_pos = 0; array_pos < array_token.size(); array_pos++)
                 {
-                    cin >> out_file;
-                    break;
-                }
-                for(int i = 0; i < currentImage->getWidth(); i++)
-                {
-                    for (int j = 0; j < currentImage->getHeight(); j++)
+                    if(strcmp(token_name.c_str(), array_token[array_pos].getName().c_str()) == 0)
                     {
-                        printf("Pixel is: %d\n", currentImage->getPixel(i, j).pixel_value);
+                        break;
                     }
                 }
-
-                // Generate the output file with pgm format
-                //std::cin.ignore(256, '\n');
-                std::cin >> out_file;
-                //getline(cin, out_file);
-                ofstream myfile(out_file);
-                if(!myfile.is_open())
+                if(array_pos == array_token.size())
                 {
-                    cout << "Unable to open file " << out_file;
-                    return -1; 
+                    cout << "Token " << token_name << " does not exist!" << endl;
                 }
-
-                myfile << "P2" << endl;
-                myfile << to_string(currentImage->getWidth()) << " ";
-                myfile << to_string(currentImage->getHeight()) << " ";
-                myfile << to_string(currentImage->getMaxLuminocity()) << endl;
-
-                for(int i = 0; i < currentImage->getWidth(); i++)
+                else
                 {
-                    for (int j = 0; j < currentImage->getHeight(); j++)
+                    currentImage = array_token[array_pos].getPtr();
+
+
+                    if(currentImage == NULL)
                     {
-                        myfile << to_string(currentImage->getPixel(i, j).pixel_value) << endl;
+                        cin >> out_file;
+                        break;
                     }
+                    for(int i = 0; i < currentImage->getWidth(); i++)
+                    {
+                        for (int j = 0; j < currentImage->getHeight(); j++)
+                        {
+                            printf("Pixel is: %d\n", currentImage->getPixel(i, j).pixel_value);
+                        }
+                    }
+
+                    // Generate the output file with pgm format
+                    //std::cin.ignore(256, '\n');
+                    //std::cin >> out_file;
+                    //getline(cin, out_file);
+                    ifstream ifile(out_file.c_str());
+                    
+                    if(ifile.good())
+                    {   
+                        cout << "[ERROR] File exists!" << endl;
+                        break;
+                    }
+                    else
+                    {
+                        ofstream myfile(out_file);
+                        if(!myfile.is_open())
+                        {
+                            //cout << "Unable to open file " << out_file;
+                            cout << "[ERROR] Unable to create file" << endl;
+                        }
+                        else
+                        {
+                            myfile << "P2" << endl;
+                            myfile << to_string(currentImage->getWidth()) << " ";
+                            myfile << to_string(currentImage->getHeight()) << " ";
+                            myfile << to_string(currentImage->getMaxLuminocity()) << endl;
+
+                            for(int i = 0; i < currentImage->getWidth(); i++)
+                            {
+                                for (int j = 0; j < currentImage->getHeight(); j++)
+                                {
+                                    myfile << to_string(currentImage->getPixel(i, j).pixel_value) << endl;
+                                }
+                            }
+                            cout << "[OK] Export " << token_name << endl;
+
+                        }
+
+                    }
+
                 }
 
                 break;
 
+            }
+
+            case 'd':
+            {
+                cin >> token_name;
+
+                array_pos = checkToken(token_name, array_token);
+                if( array_pos == array_token.size())
+                {
+                    cout << "Token " << token_name << " does not exists!" << endl;
+                    break;
+                }
+
+                delete array_token[array_pos].getPtr();
+                array_token.erase(array_token.begin()+array_pos);
+
+                cout << "[OK] " << "Delete " << token_name << endl;
+                break;
             }
 
             default:
