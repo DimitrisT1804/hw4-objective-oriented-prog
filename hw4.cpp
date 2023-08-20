@@ -2,15 +2,24 @@
 #include <fstream>
 #include <vector>
 #include <string.h>
-#include <filesystem>
+
+#include <math.h>
+#include <algorithm>
+
+//#include <filesystem>
+
+// #include "GSCImage.hpp"
+// #include "Image.hpp"
+// #include "Pixel.hpp"
+// #include "Token.hpp"
+// #include "GSCPixel.hpp"
 
 using namespace std;
-// #include "Image.cpp"
 
 class Pixel
 {
     public:
-        int pixel_value = 0;    // keep the value of pixel
+        int pixel_value = -1;    // keep the value of pixel
 };
 
 class RGBPixel : public Pixel 
@@ -41,7 +50,10 @@ class GSCPixel : public Pixel
 
         }
 
-        unsigned char getValue();
+        int getValue()        //kanonika itan unsigned char
+        {
+            return Pixel::pixel_value;
+        }
         void setValue(unsigned char value);
 
         void setValue(int value)
@@ -112,6 +124,20 @@ class GSCImage : public Image
         int counter = 0;
         GSCImage() = default;
 
+        GSCImage(int width, int height)
+        {
+
+            this->width = width;
+            this->height = height;
+
+            currentImage = new GSCPixel* [width];
+
+            for(int i = 0; i < width; i++)
+            {
+                currentImage[i] = new GSCPixel[height];
+            }   
+        }
+
         GSCImage(const GSCImage& img)
         {
             height = img.height;
@@ -130,6 +156,8 @@ class GSCImage : public Image
             string word;
             int value = 0;
             int i = 0, j = 0;
+
+            //Image& thisImage = currentImage;
 
             while(!stream.eof())
             {
@@ -157,13 +185,14 @@ class GSCImage : public Image
                     /* a way to add the value in each pixel, it works!*/
                     value = stoi(word);
                     currentImage[i][j].setValue(value);
-                    if(j >= height-1)
+                    if(j == height - 1)
                     {
                         i++;
                         j = 0;
                         if(i == width)
                         {
                             i = 0;
+                            break;
                         }
                     }
                     else
@@ -191,21 +220,105 @@ class GSCImage : public Image
 
         virtual Image& operator += (int times) override
         {
-            // currentImage
-            // for(int i = 0; i < height; i++)
-            // {
-            //     for(int j = 0; j < width; j++)
-            //     {
-            //         currentImage[i][j] = currentImage[j][i];
-            //     }
-            // }
+
+            int old_width = width;
+            int old_height = height;
+
+            width = height;
+            height = old_width;
+
+            GSCPixel **newImage = new GSCPixel*[width];
+            for(int i = 0; i < width; i++)
+            {
+                newImage[i] = new GSCPixel[height];
+            }
+
+            for (int i = 0; i < old_width; i++)
+            {
+                for(int j = 0; j < old_height; j++)
+                {
+                    newImage[width-i-1][j].setValue(currentImage[i][j].getValue()); 
+                }
+            }
+
+            currentImage = newImage;
+
+            for(int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    cout << to_string(currentImage[i][j].getValue()) << endl;
+                }
+            }            
+
+            return *this;
+            // 1 2 3 4  ->  9 5 1
+            // 5 6 7 8  ->  1 6 2
+            // 9 1 0 3  ->  0 7 3
+            //              3 8 4
         }
         virtual Image& operator *= (double factor) override
         {
+            //GSCImage *newImage = new GSCImage(width*factor, height*factor);
+            int old_width = width;
+            int old_height = height;
+            
+            width = width * factor;
+            height = height * factor;
+
+            GSCPixel** newImage = new GSCPixel*[width];
+            for (int i = 0; i < width; i++) 
+            {
+                newImage[i] = new GSCPixel[height];
+            }
+
+
+            int r1, r2;
+            int c1, c2;
+            int avg = 0;
+            int add;
+
+
+            for(int i = 0; i < width; i++)
+            {
+                for(int j = 0; j < height; j++)
+                {
+                    r1 = min((int) floor(i/factor), old_width - 1 );
+                    r2 = min((int) ceil(i/factor), old_width - 1);
+                    c1 = min((int) floor(j/factor), old_height - 1);
+                    c2 = min((int) ceil(j/factor), old_height - 1);
+
+                    add = currentImage[r1][c1].getValue() + currentImage[r1][c2].getValue() + currentImage[r2][c1].getValue() + currentImage[r2][c2].getValue();
+
+                    avg = add / 4;
+                    newImage[i][j].setValue(avg);
+                }
+
+            }
+
+            for(int i = 0; i < old_width; i++)      // delete the old image
+            {
+                delete[] currentImage[i];
+            }
+            delete[] currentImage;
+
+            currentImage = newImage;
+
+
+            return *this;
 
         }
         virtual Image& operator ! () override
         {
+            for(int i = 0; i < width; i++)
+            {
+                for(int j = 0; j < height; j++)
+                {
+                    currentImage[i][j].setValue(max_luminocity - currentImage[i][j].getValue());
+                }
+            }
+
+            return *this;
 
         }
         virtual Image& operator ~ () override
@@ -310,6 +423,15 @@ long unsigned int checkToken(string Token_name, vector <Token> array_token)
     return i;   // not exist!
 }
 
+bool check_symbol(string Token_name)
+{
+    if(Token_name[0] != '$')
+    {
+        return true;
+    }
+    return false;
+}
+
 
 int main()
 {
@@ -325,6 +447,10 @@ int main()
     string as;  // just to ignore a character
     long unsigned int array_pos = -1;
 
+    GSCImage* GSC;
+
+    double factor;
+
 
     //array = (Token **) malloc(sizeof(Token));
     //array_size++;
@@ -333,29 +459,42 @@ int main()
     {
         std::cout << "i <filename> as <$token>" << endl;
         std::cout << "e <$token> as <filename>" << endl;
+        std::cout << "d <$token>" << endl;
+        std::cout << "n <$token>" << endl;
+        std::cout << "s $token by factor" << endl;
         std::cin >> selection;
         // std::cin.ignore();
 
         switch(selection)
         {
-            case 'a':
+            case 'i':
             {
                 cin >> filename;
                 cin >> as;
                 cin >> token_name;
 
-                currentImage = readNetpbmImage(filename.c_str());
+                currentImage = (GSCImage*) readNetpbmImage(filename.c_str());
+                GSC = (GSCImage*) currentImage;
                 printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
 
                 //array = (Token *) realloc(array, array_size*sizeof(Token));
                 //Token* Image_token = new Token("kati", currentImage);
 
                 /*New version for array*/
+                if(check_symbol(token_name))
+                {
+                    cout << "[ERROR] Token " << token_name << " does not have $ as first character!" << endl;
+                    break;
+                }
+
+
                 if(array_token.size() != 0)
                 {
+
                     if(checkToken(token_name, array_token) != array_token.size())
                     {
                         cout << "[ERROR] Token " << token_name << " exists!" << endl;
+                        
                         break;
                     }
                 }
@@ -434,7 +573,7 @@ int main()
                             {
                                 for (int j = 0; j < currentImage->getHeight(); j++)
                                 {
-                                    myfile << to_string(currentImage->getPixel(i, j).pixel_value) << endl;
+                                    myfile << to_string(GSC->currentImage[i][j].getValue()) << endl;
                                 }
                             }
                             cout << "[OK] Export " << token_name << endl;
@@ -465,6 +604,70 @@ int main()
 
                 cout << "[OK] " << "Delete " << token_name << endl;
                 break;
+            }
+
+            case 'n':
+            {
+                cin >> token_name;
+
+                array_pos = checkToken(token_name, array_token);
+                if( array_pos == array_token.size())
+                {
+                    cout << "Token " << token_name << " does not exists!" << endl;
+                    break;
+                }
+
+                currentImage = array_token[array_pos].getPtr();
+
+                //currentImage->operator!();
+                (*currentImage) = !(*currentImage);
+
+                std::cout << "[OK] Color" << endl;
+
+                break;
+            }
+
+            case 's':
+            {
+                cin >> token_name;
+                cin >> as;
+                cin >> factor;
+
+                array_pos = checkToken(token_name, array_token);
+                if( array_pos == array_token.size())
+                {
+                    cout << "Token " << token_name << " does not exists!" << endl;
+                    break;
+                }
+
+                currentImage = array_token[array_pos].getPtr();
+
+                //(*currentImage) *= factor;
+                *currentImage = (*currentImage) *= factor;
+
+                break;
+
+            }
+
+            case 'z':
+            {
+                cin >> token_name;
+                cin >> as;
+                cin >> factor;
+
+                array_pos = checkToken(token_name, array_token);
+                if( array_pos == array_token.size())
+                {
+                    cout << "Token " << token_name << " does not exists!" << endl;
+                    break;
+                }
+
+                currentImage = array_token[array_pos].getPtr();
+
+                //(*currentImage) *= factor;
+                *currentImage = (*currentImage) += 1;        
+
+                break;        
             }
 
             default:

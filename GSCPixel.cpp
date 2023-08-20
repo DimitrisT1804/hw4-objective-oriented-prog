@@ -1,12 +1,19 @@
 //
-#include "Pixel.cpp"
-class GSCPixel : public Pixel
-{
-    public:
-        GSCPixel() = default;
-        GSCPixel(const GSCPixel& p);
-        GSCPixel(unsigned char value);
-        unsigned char getValue();
-        void setValue(unsigned char value);   
+#include "GSCPixel.hpp"
+// class GSCPixel : public Pixel
+// {   
+//     ~GSCPixel()
+//     {
 
-};
+//     }
+
+//     void setValue(int value)
+//     {
+//         pixel_value = value;
+//     }   
+// };
+
+void GSCPixel::setValue(int value)
+{
+    pixel_value = value;
+}
