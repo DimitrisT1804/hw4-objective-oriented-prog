@@ -130,11 +130,11 @@ class GSCImage : public Image
             this->width = width;
             this->height = height;
 
-            currentImage = new GSCPixel* [width];
+            currentImage = new GSCPixel* [height];
 
-            for(int i = 0; i < width; i++)
+            for(int i = 0; i < height; i++)
             {
-                currentImage[i] = new GSCPixel[height];
+                currentImage[i] = new GSCPixel[width];
             }   
         }
 
@@ -166,14 +166,14 @@ class GSCImage : public Image
                 if(counter == 1)    // get width
                 {
                     width = stoi(word);
-                    currentImage = new GSCPixel* [width];
                 }
                 else if(counter == 2)   // get height
                 {
                     height = stoi(word);
-                    for(int i = 0; i < width; i++)
+                    currentImage = new GSCPixel* [height];
+                    for(int i = 0; i < height; i++)
                     {
-                        currentImage[i] = new GSCPixel[height];
+                        currentImage[i] = new GSCPixel[width];
                     }
                 }
                 else if(counter == 3)   // get max_luminocity
@@ -185,11 +185,11 @@ class GSCImage : public Image
                     /* a way to add the value in each pixel, it works!*/
                     value = stoi(word);
                     currentImage[i][j].setValue(value);
-                    if(j == height - 1)
+                    if(j == width - 1)
                     {
                         i++;
                         j = 0;
-                        if(i == width)
+                        if(i == height)
                         {
                             i = 0;
                             break;
@@ -208,7 +208,7 @@ class GSCImage : public Image
         ~GSCImage()
         {
            // free(currentImage);
-            for(int i = 0; i < width; i++)
+            for(int i = 0; i < height; i++)
             {
                 delete[] currentImage[i];
             }
@@ -221,36 +221,46 @@ class GSCImage : public Image
         virtual Image& operator += (int times) override
         {
 
-            int old_width = width;
-            int old_height = height;
-
-            width = height;
-            height = old_width;
-
-            GSCPixel **newImage = new GSCPixel*[width];
-            for(int i = 0; i < width; i++)
+            for(int k = 0; k < times; k++)
             {
-                newImage[i] = new GSCPixel[height];
-            }
+                int old_width = width;
+                int old_height = height;
 
-            for (int i = 0; i < old_width; i++)
-            {
-                for(int j = 0; j < old_height; j++)
+                width = height;
+                height = old_width;
+
+                GSCPixel **newImage = new GSCPixel*[height];
+                for(int i = 0; i < height; i++)
                 {
-                    newImage[width-i-1][j].setValue(currentImage[i][j].getValue()); 
+                    newImage[i] = new GSCPixel[width];
                 }
-            }
 
-            currentImage = newImage;
-
-            for(int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
+                for (int i = 0; i < old_height; i++)
                 {
-                    cout << to_string(currentImage[i][j].getValue()) << endl;
+                    for(int j = 0; j < old_width; j++)
+                    {
+                        newImage[j][width-i-1].setValue(currentImage[i][j].getValue()); 
+                    }
                 }
-            }            
 
+
+                for(int i = 0; i < old_height; i++)      // delete the old image
+                {
+                    delete[] currentImage[i];
+                }
+                delete[] currentImage;
+
+                currentImage = newImage;
+
+                // for(int i = 0; i < width; i++)
+                // {
+                //     for (int j = 0; j < height; j++)
+                //     {
+                //         cout << to_string(currentImage[i][j].getValue()) << endl;
+                //     }
+                // }            
+
+            }
             return *this;
             // 1 2 3 4  ->  9 5 1
             // 5 6 7 8  ->  1 6 2
@@ -266,10 +276,10 @@ class GSCImage : public Image
             width = width * factor;
             height = height * factor;
 
-            GSCPixel** newImage = new GSCPixel*[width];
-            for (int i = 0; i < width; i++) 
+            GSCPixel** newImage = new GSCPixel*[height];
+            for (int i = 0; i < height; i++) 
             {
-                newImage[i] = new GSCPixel[height];
+                newImage[i] = new GSCPixel[width];
             }
 
 
@@ -279,14 +289,14 @@ class GSCImage : public Image
             int add;
 
 
-            for(int i = 0; i < width; i++)
+            for(int i = 0; i < height; i++)
             {
-                for(int j = 0; j < height; j++)
+                for(int j = 0; j < width; j++)
                 {
-                    r1 = min((int) floor(i/factor), old_width - 1 );
-                    r2 = min((int) ceil(i/factor), old_width - 1);
-                    c1 = min((int) floor(j/factor), old_height - 1);
-                    c2 = min((int) ceil(j/factor), old_height - 1);
+                    r1 = min((int) floor(i/factor), old_height - 1 );
+                    r2 = min((int) ceil(i/factor), old_height - 1);
+                    c1 = min((int) floor(j/factor), old_width - 1);
+                    c2 = min((int) ceil(j/factor), old_width - 1);
 
                     add = currentImage[r1][c1].getValue() + currentImage[r1][c2].getValue() + currentImage[r2][c1].getValue() + currentImage[r2][c2].getValue();
 
@@ -296,7 +306,7 @@ class GSCImage : public Image
 
             }
 
-            for(int i = 0; i < old_width; i++)      // delete the old image
+            for(int i = 0; i < old_height; i++)      // delete the old image
             {
                 delete[] currentImage[i];
             }
@@ -310,9 +320,9 @@ class GSCImage : public Image
         }
         virtual Image& operator ! () override
         {
-            for(int i = 0; i < width; i++)
+            for(int i = 0; i < height; i++)
             {
-                for(int j = 0; j < height; j++)
+                for(int j = 0; j < width; j++)
                 {
                     currentImage[i][j].setValue(max_luminocity - currentImage[i][j].getValue());
                 }
@@ -535,13 +545,13 @@ int main()
                         cin >> out_file;
                         break;
                     }
-                    for(int i = 0; i < currentImage->getWidth(); i++)
-                    {
-                        for (int j = 0; j < currentImage->getHeight(); j++)
-                        {
-                            printf("Pixel is: %d\n", currentImage->getPixel(i, j).pixel_value);
-                        }
-                    }
+                    // for(int i = 0; i < currentImage->getWidth(); i++)
+                    // {
+                    //     for (int j = 0; j < currentImage->getHeight(); j++)
+                    //     {
+                    //         printf("Pixel is: %d\n", currentImage->getPixel(i, j).pixel_value);
+                    //     }
+                    // }
 
                     // Generate the output file with pgm format
                     //std::cin.ignore(256, '\n');
@@ -569,9 +579,9 @@ int main()
                             myfile << to_string(currentImage->getHeight()) << " ";
                             myfile << to_string(currentImage->getMaxLuminocity()) << endl;
 
-                            for(int i = 0; i < currentImage->getWidth(); i++)
+                            for(int i = 0; i < currentImage->getHeight(); i++)
                             {
-                                for (int j = 0; j < currentImage->getHeight(); j++)
+                                for (int j = 0; j < currentImage->getWidth(); j++)
                                 {
                                     myfile << to_string(GSC->currentImage[i][j].getValue()) << endl;
                                 }
