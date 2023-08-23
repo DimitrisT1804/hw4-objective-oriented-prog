@@ -23,6 +23,7 @@ class Pixel
         unsigned char red = ' ';
         unsigned char green = ' ';
         unsigned char blue = ' ';    
+        int Y = -1, U = -1, V = -1;
 };
 
 class RGBPixel : public Pixel 
@@ -152,6 +153,16 @@ class Image
 
     }
 };
+
+int clip(double value)
+{
+    if(value < 0)
+        return 0;
+    else if(value > 255)
+        return 255;
+    else
+        return value;
+}
 
 class RGBImage : public Image 
 {
@@ -418,7 +429,89 @@ class RGBImage : public Image
         } 
         virtual Image& operator ~() override
         {
+            int red_value, green_value, blue_value;
 
+            int histogram_array[max_luminocity+1] = {0};
+            int pixels_size = height*width;
+            double possibility_array[max_luminocity+1] = {0.0}, final_possibility_array[max_luminocity + 1] = {0};
+            double possibility = 0;
+            int final_array[max_luminocity+1] = {0};
+            int C, D, E;
+
+            for(int i = 0; i < height; i++)
+            {
+                for(int j = 0; j < width; j++)
+                {
+
+                    red_value = (int) currentImage[i][j].getRed();
+                    green_value = (int) currentImage[i][j].getGreen();
+                    blue_value = (int) currentImage[i][j].getBlue();
+
+                    currentImage[i][j].Y = ((66*red_value + 129*green_value + 25*blue_value + 128) >> 8) + 16;
+                    currentImage[i][j].U = ((-38*red_value - 74*green_value + 112*blue_value + 128) >> 8) + 128;
+                    currentImage[i][j].V = ((112*red_value - 94*green_value - 18*blue_value + 128) >> 8) + 128;
+                    
+                    histogram_array[currentImage[i][j].Y]++;
+
+                }
+            }   
+
+            for(int i = 0; i <= max_luminocity; i++)
+            {
+                cout << "The array pos " << i << " is " << histogram_array[i] << endl;
+                possibility_array[i] = (double)(histogram_array[i])/ (double)pixels_size;
+                cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
+            }         
+
+            for(int i = 0; i <= max_luminocity; i++)
+            {
+                for(int j = 0; j <= i; j++)
+                {
+                    possibility = possibility + possibility_array[j]; 
+
+                }
+                final_possibility_array[i] = possibility;
+                possibility = 0;
+            }       
+
+            for(int i = 0; i <= max_luminocity; i++)
+            {
+                cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
+            }    
+
+            for(int i = 0; i <= max_luminocity; i++)
+            {
+                final_array[i] = (int) (235.0*final_possibility_array[i]);
+                cout << "The array pos " << i << " is " << final_array[i] << endl;
+            }
+
+            for(int k = 0; k <= max_luminocity; k++)
+            {
+                for(int i = 0; i < height; i++)
+                {
+                    for(int j = 0; j < width; j++)
+                    {
+                        if(currentImage[i][j].Y == k)
+                            currentImage[i][j].Y = final_array[k];
+                    }
+                }   
+            }
+           
+            for(int i = 0; i < height; i++)
+            {
+                for(int j = 0; j < width; j++)
+                {
+                    C = currentImage[i][j].Y - 16;
+                    D = currentImage[i][j].U - 128;
+                    E = currentImage[i][j].V - 128;
+
+                    currentImage[i][j].setRed(clip((298*C + 409*E +128) >> 8) );
+                    currentImage[i][j].setGreen(clip((298*C -100*D - 208*E +128) >> 8) );
+                    currentImage[i][j].setBlue(clip((298*C + 516*D + 128) >> 8) );
+                }
+            }  
+
+            return *this;
         }
         virtual Image& operator *() override
         {
@@ -1188,6 +1281,15 @@ int main()
 
                 break;
 
+            }
+
+            case 'z':
+            {
+                cin >> token_name;
+
+                (*currentImage) =~ *currentImage;
+
+                break;
             }
 
             default:
