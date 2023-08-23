@@ -438,14 +438,21 @@ class RGBImage : public Image
             int final_array[max_luminocity+1] = {0};
             int C, D, E;
 
+
+            RGBPixel** newImage = new RGBPixel*[height];
+            for (int i = 0; i < height; i++) 
+            {
+                newImage[i] = new RGBPixel[width];
+            }
+
             for(int i = 0; i < height; i++)
             {
                 for(int j = 0; j < width; j++)
                 {
 
-                    red_value = (int) currentImage[i][j].getRed();
-                    green_value = (int) currentImage[i][j].getGreen();
-                    blue_value = (int) currentImage[i][j].getBlue();
+                    red_value = currentImage[i][j].getRed();
+                    green_value = currentImage[i][j].getGreen();
+                    blue_value = currentImage[i][j].getBlue();
 
                     currentImage[i][j].Y = ((66*red_value + 129*green_value + 25*blue_value + 128) >> 8) + 16;
                     currentImage[i][j].U = ((-38*red_value - 74*green_value + 112*blue_value + 128) >> 8) + 128;
@@ -485,6 +492,16 @@ class RGBImage : public Image
                 cout << "The array pos " << i << " is " << final_array[i] << endl;
             }
 
+            for(int i = 0; i < height; i++)
+            {
+                for(int j = 0; j < width; j++)
+                {
+                    newImage[i][j].U = currentImage[i][j].U;
+                    newImage[i][j].Y = currentImage[i][j].Y;
+                    newImage[i][j].V = currentImage[i][j].V;
+                }
+            }
+
             for(int k = 0; k <= max_luminocity; k++)
             {
                 for(int i = 0; i < height; i++)
@@ -492,10 +509,18 @@ class RGBImage : public Image
                     for(int j = 0; j < width; j++)
                     {
                         if(currentImage[i][j].Y == k)
-                            currentImage[i][j].Y = final_array[k];
+                            newImage[i][j].Y = final_array[k];
                     }
                 }   
             }
+
+            for(int i = 0; i < height; i++)      // delete the old image
+            {
+                delete[] currentImage[i];
+            }
+            delete[] currentImage;
+            currentImage = newImage;
+
            
             for(int i = 0; i < height; i++)
             {
