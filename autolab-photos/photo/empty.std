@@ -1,0 +1,14 @@
+i <filename> as <$token>
+e <$token> as <filename>
+d <$token>
+n <$token>
+s <$token> by <factor>
+r <$token> clockwise <X> times
+m <$token>
+i <filename> as <$token>
+e <$token> as <filename>
+d <$token>
+n <$token>
+s <$token> by <factor>
+r <$token> clockwise <X> times
+m <$token>
