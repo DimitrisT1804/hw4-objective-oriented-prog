@@ -457,9 +457,9 @@ class RGBImage : public Image
 
             for(int i = 0; i <= max_luminocity; i++)
             {
-                //cout << "The array pos " << i << " is " << histogram_array[i] << endl;
+                cout << "The array pos " << i << " is " << histogram_array[i] << endl;
                 possibility_array[i] = (double)(histogram_array[i])/ (double)pixels_size;
-                //cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
+                cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
             }         
 
             for(int i = 0; i <= max_luminocity; i++)
@@ -473,15 +473,15 @@ class RGBImage : public Image
                 possibility = 0;
             }       
 
-            // for(int i = 0; i <= max_luminocity; i++)
-            // {
-            //     //cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
-            // }    
+            for(int i = 0; i <= max_luminocity; i++)
+            {
+                cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
+            }    
 
             for(int i = 0; i <= max_luminocity; i++)
             {
                 final_array[i] = (int) (235.0*final_possibility_array[i]);
-                //cout << "The array pos " << i << " is " << final_array[i] << endl;
+                cout << "The array pos " << i << " is " << final_array[i] << endl;
             }
 
             for(int i = 0; i < height; i++)
@@ -848,9 +848,9 @@ int red_value, green_value, blue_value;
 
             for(int i = 0; i <= max_luminocity; i++)
             {
-               // cout << "The array pos " << i << " is " << histogram_array[i] << endl;
+                cout << "The array pos " << i << " is " << histogram_array[i] << endl;
                 possibility_array[i] = (double)(histogram_array[i])/ (double)pixels_size;
-                //cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
+                cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
             }         
 
             for(int i = 0; i <= max_luminocity; i++)
@@ -864,15 +864,15 @@ int red_value, green_value, blue_value;
                 possibility = 0;
             }       
 
-            // for(int i = 0; i <= max_luminocity; i++)
-            // {
-            //     cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
-            // }    
+            for(int i = 0; i <= max_luminocity; i++)
+            {
+                cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
+            }    
 
             for(int i = 0; i <= max_luminocity; i++)
             {
                 final_array[i] = (int) (235.0*final_possibility_array[i]);
-                //cout << "The array pos " << i << " is " << final_array[i] << endl;
+                cout << "The array pos " << i << " is " << final_array[i] << endl;
             }
 
             for(int i = 0; i < height; i++)
@@ -1088,13 +1088,13 @@ int main()
 
     while (selection != 'q')
     {
-        // std::cout << "i <filename> as <$token>" << endl;
-        // std::cout << "e <$token> as <filename>" << endl;
-        // std::cout << "d <$token>" << endl;
-        // std::cout << "n <$token>" << endl;
-        // std::cout << "s <$token> by <factor>" << endl;
-        // std::cout << "r <$token> clockwise <X> times" << endl; 
-        // std::cout <<"m <$token>" << endl; 
+        std::cout << "i <filename> as <$token>" << endl;
+        std::cout << "e <$token> as <filename>" << endl;
+        std::cout << "d <$token>" << endl;
+        std::cout << "n <$token>" << endl;
+        std::cout << "s <$token> by <factor>" << endl;
+        std::cout << "r <$token> clockwise <X> times" << endl; 
+        std::cout <<"m <$token>" << endl; 
         std::cin >> selection;
         if(!isalpha(selection))
         {
@@ -1191,7 +1191,7 @@ int main()
                     
                     if(ifile.good())
                     {   
-                        cout << "[ERROR] File exists" << endl;
+                        cout << "[ERROR] File exists!" << endl;
                         break;
                     }
                     else
@@ -1221,12 +1221,12 @@ int main()
                             GSCImage* check_image = dynamic_cast<GSCImage*>(currentImage);
                             if(check_image)
                             {
-                                //cout << "It is of GSC Image!" << endl;
+                                cout << "It is of GSC Image!" << endl;
                                 myfile << *currentImage << endl;
                                 break;
                             }
                             
-                            //cout << "It is of RGB Image!" << endl;
+                            cout << "It is of RGB Image!" << endl;
 
                             myfile << "P3" << endl;
                             myfile << to_string(currentImage->getWidth()) << " ";
@@ -1246,7 +1246,6 @@ int main()
                             }
 
                             //myfile << *currentImage << endl;
-                            cout << "[OK] Export " << token_name << endl;
 
                         }
 
@@ -1315,8 +1314,6 @@ int main()
                 //(*currentImage) *= factor;
                 *currentImage = (*currentImage) *= factor;
 
-                cout << "[OK] Scale " << token_name << endl;
-
                 break;
 
             }
@@ -1352,9 +1349,7 @@ int main()
                 currentImage = array_token[array_pos].getPtr();
 
                 //(*currentImage) *= factor;
-                *currentImage = (*currentImage) += times;   
-
-                cout << "[OK] Rotate " << token_name << endl;     
+                *currentImage = (*currentImage) += times;        
 
                 break;        
             }
@@ -1373,8 +1368,6 @@ int main()
                 currentImage = array_token[array_pos].getPtr();
 
                 *currentImage =* (*currentImage);
-
-                cout << "[OK] Mirror " << token_name << endl;
 
                 break;
             }
@@ -1408,8 +1401,7 @@ int main()
                 delete rgbPointer;      // delete previous object with RGB image
 
                 array_token[array_pos].setPtr(convert_image);
-                
-                cout << "[OK] Grayscale " << token_name << endl;
+
                 break;
 
             }
@@ -1418,17 +1410,7 @@ int main()
             {
                 cin >> token_name;
 
-                array_pos = checkToken(token_name, array_token);
-                if( array_pos == array_token.size())
-                {
-                    cout << "Token " << token_name << " does not exists!" << endl;
-                    break;
-                }
-                currentImage = array_token[array_pos].getPtr();
-
                 (*currentImage) =~ *currentImage;
-
-                cout << "[OK] Equalize " << token_name << endl;
 
                 break;
             }
@@ -1440,15 +1422,9 @@ int main()
         }
 
     }
-    int token_size = (int)array_token.size();
-    for (int i = 0; i < token_size; i++)
+    for (int i = 0; i < (int)array_token.size(); i++)
     {
         delete array_token[i].getPtr();
-        // array_token.erase(array_token.begin()+i);
-    }
-
-    for (int i = 0; i < token_size; i++)
-    {
         array_token.erase(array_token.begin()+i);
     }
     
