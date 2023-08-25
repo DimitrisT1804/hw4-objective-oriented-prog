@@ -1096,6 +1096,7 @@ int main()
         // std::cout << "r <$token> clockwise <X> times" << endl; 
         // std::cout <<"m <$token>" << endl; 
         std::cin >> selection;
+        //cout << "selection is " << selection << endl;
         if(!isalpha(selection))
         {
             return -1;      // it is not alphabetic input
@@ -1163,7 +1164,7 @@ int main()
                 }
                 if(array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exist!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                 }
                 else
                 {
@@ -1223,6 +1224,7 @@ int main()
                             {
                                 //cout << "It is of GSC Image!" << endl;
                                 myfile << *currentImage << endl;
+                                cout << "[OK] Export " << token_name << endl;
                                 break;
                             }
                             
@@ -1265,7 +1267,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
 
@@ -1283,7 +1285,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
 
@@ -1292,7 +1294,7 @@ int main()
                 //currentImage->operator!();
                 (*currentImage) = !(*currentImage);
 
-                std::cout << "[OK] Color" << endl;
+                std::cout << "[OK] Color Inversion " << token_name << endl;
 
                 break;
             }
@@ -1306,7 +1308,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
 
@@ -1345,7 +1347,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
 
@@ -1366,7 +1368,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
 
@@ -1386,7 +1388,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
                 currentImage = array_token[array_pos].getPtr();
@@ -1421,7 +1423,7 @@ int main()
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
                 {
-                    cout << "Token " << token_name << " does not exists!" << endl;
+                    cout << "[ERROR] Token " << token_name << " not found!" << endl;
                     break;
                 }
                 currentImage = array_token[array_pos].getPtr();
