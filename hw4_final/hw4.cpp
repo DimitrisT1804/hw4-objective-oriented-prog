@@ -108,6 +108,12 @@ int main()
                 cin >> as;
                 cin >> token_name;
 
+                if(as != "as")
+                {
+                    cout << endl << "-- Invalid command! --" << endl;
+                    break;
+                }
+
                 currentImage = readNetpbmImage(filename.c_str());
                 //printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
 
@@ -151,6 +157,12 @@ int main()
                 cin >> token_name;
                 cin >> as;
                 cin >> out_file;
+
+                if(as != "as")
+                {
+                    cout << endl << "-- Invalid command! --" << endl;
+                    break;
+                }
 
                 for(array_pos = 0; array_pos < array_token.size(); array_pos++)
                 {
@@ -315,6 +327,11 @@ int main()
                 cin >> token_name;
                 cin >> as;
                 cin >> factor;
+                if(as != "by")
+                {
+                    cout << endl << "-- Invalid command! --" << endl;
+                    break;
+                }
 
                 array_pos = checkToken(token_name, array_token);
                 if( array_pos == array_token.size())
@@ -340,6 +357,12 @@ int main()
                 cin >> as;
                 cin >> times;
                 cin >> just_input;
+
+                if(as != "clockwise" || just_input != "times")
+                {
+                    cout << endl << "-- Invalid command! --" << endl;
+                    break;
+                }
 
                 if(times > 4)
                     times = times%4;
