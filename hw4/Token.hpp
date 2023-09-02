@@ -1,3 +1,5 @@
+/* Header File for Token class */
+
 #include <string.h>
 #include <iostream>
 #include "Image.hpp"

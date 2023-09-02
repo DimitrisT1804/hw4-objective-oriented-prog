@@ -1,3 +1,5 @@
+/* Source File for Pixel class*/
+
 #include "RGBPixel.hpp"
 
 RGBPixel::RGBPixel(unsigned char r, unsigned char g, unsigned char b)
@@ -21,7 +23,7 @@ unsigned char RGBPixel::getBlue() const
 }
 void RGBPixel::setRed(int r)
 {
-    Pixel::red = static_cast<char> (r);
+    Pixel::red = static_cast<char> (r);     // transform from int to char
 }
 void RGBPixel::setGreen(int g)
 {

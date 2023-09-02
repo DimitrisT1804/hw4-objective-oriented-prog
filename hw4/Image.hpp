@@ -1,3 +1,5 @@
+/* Header File for Image abstract class*/
+
 #ifndef IMAGE_H
 #define IMAGE_H
 

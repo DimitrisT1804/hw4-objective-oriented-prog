@@ -1,7 +1,10 @@
+/* Source File for GSCImage class*/
+
 #include "GSCImage.hpp"
 #include "RGBImage.hpp"
 #include "clip.hpp"
 
+// Constructor with width and height
 GSCImage::GSCImage(int width, int height)
 {
     this->width = width;
@@ -15,6 +18,7 @@ GSCImage::GSCImage(int width, int height)
     }   
 }
 
+// copy constructor
 GSCImage::GSCImage(const GSCImage& img)
 {
     this->height = img.height;
@@ -29,6 +33,7 @@ GSCImage::GSCImage(const GSCImage& img)
     }
 }
 
+// Constructor from RGBImage to convert it to GSCImage
 GSCImage::GSCImage(const RGBImage& grayscaled)
 {
     this->height = grayscaled.getHeight();
@@ -51,13 +56,12 @@ GSCImage::GSCImage(const RGBImage& grayscaled)
     }
 }
 
+// Constructor from a file
 GSCImage::GSCImage(std::istream& stream)
 {
     string word;
     int value = 0;
     int i = 0, j = 0;
-
-    //Image& thisImage = currentImage;
 
     while(!stream.eof())
     {
@@ -82,7 +86,7 @@ GSCImage::GSCImage(std::istream& stream)
         }
         else    // it is the value of current pixel
         {
-            /* a way to add the value in each pixel, it works!*/
+            /* a way to add the value in each pixel*/
             value = stoi(word);
             currentImage[i][j].setValue(value);
             if(j == width - 1)
@@ -100,14 +104,13 @@ GSCImage::GSCImage(std::istream& stream)
                 j++;
             }
         }
-        //cout << word << endl;
     }
     counter = 0;
 }
 
+// Destructor
 GSCImage::~GSCImage()
 {
-    // free(currentImage);
     for(int i = 0; i < height; i++)
     {
         delete[] currentImage[i];
@@ -115,10 +118,13 @@ GSCImage::~GSCImage()
     delete[] currentImage;
 }
 
+// Rotate Image n times
 Image& GSCImage::operator += (int times)
 {
+    // repeat for times
     for(int k = 0; k < times; k++)
     {
+        // Create new Image
         int old_width = width;
         int old_height = height;
 
@@ -126,7 +132,8 @@ Image& GSCImage::operator += (int times)
         height = old_width;
 
         GSCPixel **newImage = new GSCPixel*[height];
-        for(int i = 0; i < height; i++)
+
+        for(int i = 0; i < height; i++)     // rotate for 90 degrees each time
         {
             newImage[i] = new GSCPixel[width];
         }
@@ -140,47 +147,34 @@ Image& GSCImage::operator += (int times)
         }
 
 
-        for(int i = 0; i < old_height; i++)      // delete the old image
+        for(int i = 0; i < old_height; i++)   // delete the old image
         {
             delete[] currentImage[i];
         }
         delete[] currentImage;
 
-        currentImage = newImage;
-
-        // for(int i = 0; i < width; i++)
-        // {
-        //     for (int j = 0; j < height; j++)
-        //     {
-        //         cout << to_string(currentImage[i][j].getValue()) << endl;
-        //     }
-        // }            
-
+        currentImage = newImage;    
     }
-    return *this;
-    // 1 2 3 4  ->  9 5 1
-    // 5 6 7 8  ->  1 6 2
-    // 9 1 0 3  ->  0 7 3
-    //              3 8 4
+    return *this;   // return pointer to GSCImage
 }
 
+// Resize image factor times, where 0 < factor <= 2.0
 Image& GSCImage::operator *= (double factor)
 {
-    //GSCImage *newImage = new GSCImage(width*factor, height*factor);
     int old_width = width;
     int old_height = height;
     
     width = width * factor;
     height = height * factor;
 
-    GSCPixel** newImage = new GSCPixel*[height];
+    GSCPixel** newImage = new GSCPixel*[height];    // create new Image
     for (int i = 0; i < height; i++) 
     {
         newImage[i] = new GSCPixel[width];
     }
 
 
-    int r1, r2;
+    int r1, r2;     // given parameters
     int c1, c2;
     int avg = 0;
     int add;
@@ -216,6 +210,7 @@ Image& GSCImage::operator *= (double factor)
 
 }
 
+// Convert Image to negative
 Image& GSCImage::operator ! ()
 {
     for(int i = 0; i < height; i++)
@@ -230,24 +225,15 @@ Image& GSCImage::operator ! ()
 
 }
 
-// int clip(double value)
-// {
-//     if(value < 0)
-//         return 0;
-//     else if(value > 255)
-//         return 255;
-//     else
-//         return value;
-// }
-
-
+// Equalize the histogram of the image
 Image& GSCImage::operator ~ ()
 {
     int red_value, green_value, blue_value;
 
-    int histogram_array[max_luminocity+1] = {0};
+    int histogram_array[max_luminocity+1] = {0};        // array to keep the histogram
     int pixels_size = height*width;
-    double possibility_array[max_luminocity+1] = {0.0}, final_possibility_array[max_luminocity + 1] = {0};
+    double possibility_array[max_luminocity+1] = {0.0};     // array to keep the possibility for each pixel to has a value
+    double final_possibility_array[max_luminocity + 1] = {0};
     double possibility = 0;
     int final_array[max_luminocity+1] = {0};
     int C, D, E;
@@ -279,9 +265,7 @@ Image& GSCImage::operator ~ ()
 
     for(int i = 0; i <= max_luminocity; i++)
     {
-        // cout << "The array pos " << i << " is " << histogram_array[i] << endl;
-        possibility_array[i] = (double)(histogram_array[i])/ (double)pixels_size;
-        //cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
+        possibility_array[i] = (double)(histogram_array[i]) / (double)pixels_size;
     }         
 
     for(int i = 0; i <= max_luminocity; i++)
@@ -295,22 +279,16 @@ Image& GSCImage::operator ~ ()
         possibility = 0;
     }       
 
-    // for(int i = 0; i <= max_luminocity; i++)
-    // {
-    //     cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
-    // }    
-
     for(int i = 0; i <= max_luminocity; i++)
     {
-        final_array[i] = (int) (235.0*final_possibility_array[i]);
-        //cout << "The array pos " << i << " is " << final_array[i] << endl;
+        final_array[i] = (int) (235.0*final_possibility_array[i]);      // int array to keep to cut the decimals
     }
 
     for(int i = 0; i < height; i++)
     {
         for(int j = 0; j < width; j++)
         {
-            newImage[i][j].U = currentImage[i][j].U;
+            newImage[i][j].U = currentImage[i][j].U;        // add the values
             newImage[i][j].Y = currentImage[i][j].Y;
             newImage[i][j].V = currentImage[i][j].V;
         }
@@ -323,7 +301,9 @@ Image& GSCImage::operator ~ ()
             for(int j = 0; j < width; j++)
             {
                 if(currentImage[i][j].Y == k)
-                    newImage[i][j].Y = final_array[k];
+                {
+                    newImage[i][j].Y = final_array[k];      // replace values of pixels with ones on the final_array
+                }
             }
         }   
     }
@@ -336,6 +316,7 @@ Image& GSCImage::operator ~ ()
     currentImage = newImage;
 
     int value;
+    // convert Image from YUV to RGB again
     for(int i = 0; i < height; i++)
     {
         for(int j = 0; j < width; j++)
@@ -357,6 +338,7 @@ Image& GSCImage::operator ~ ()
     return *this;            
 }
 
+// reverse image to the vertical axis
 Image& GSCImage::operator * ()
 {
     for(int i = 0; i < height; i++)
@@ -370,27 +352,8 @@ Image& GSCImage::operator * ()
     return *this;
 }
 
+// method to return the specific Pixel
 Pixel& GSCImage::getPixel(int row, int col) const
 {
     return currentImage[row][col];
 }
-
-// std::ostream& GSCImage::operator << (std::ostream& out, Image& image)
-// {
-//     out << "P2" << endl;
-//     out << to_string(image.getWidth()) << " ";
-//     out << to_string(image.getHeight()) << " ";
-//     out << to_string(image.getMaxLuminocity()) << endl;
-
-
-//     for(int i = 0; i < image.getHeight(); i++)
-//     {
-//         for (int j = 0; j < image.getWidth(); j++)
-//         {
-//             //out << to_string(image.myImage[i][j].pixel_value) << endl;
-//             out << to_string(image.getPixel(i, j).pixel_value) << endl;
-//         }
-//     }
-
-//     return out;
-// }

@@ -1,3 +1,5 @@
+/* Header File for GSCImage class*/
+
 #ifndef PIXEL_H
 #define PIXEL_H
 
@@ -19,6 +21,7 @@ class GSCImage : public Image
 {
     public:
         GSCPixel** currentImage;   // the array of current image
+                                   // double pointer to GSCPixel to represent a 2D array of GSCPixels
         int counter = 0;
         GSCImage() = default;
 
@@ -28,7 +31,7 @@ class GSCImage : public Image
 
         GSCImage(const RGBImage& grayscaled);
 
-        GSCImage(std::istream& stream);
+        GSCImage(std::istream& stream);     // constructor from file
 
         virtual ~GSCImage();
 

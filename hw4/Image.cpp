@@ -1,3 +1,5 @@
+/* Source File for Image abstract class*/
+
 #include "Image.hpp"
 
 int Image::getWidth() const { return width; }

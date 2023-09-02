@@ -1,7 +1,9 @@
+/* Source File for Pixel class*/
+
 #include "GSCPixel.hpp"
 
 
-int GSCPixel::getValue()        //kanonika itan unsigned char
+int GSCPixel::getValue()
 {
     return Pixel::pixel_value;
 }

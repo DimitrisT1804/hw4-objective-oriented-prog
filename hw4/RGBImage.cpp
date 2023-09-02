@@ -1,12 +1,16 @@
+/* Source File for RGBImage class*/
+
 #include "RGBImage.hpp"
 #include "clip.hpp"
 
+// Default constructor
 RGBImage::RGBImage()
 {
     height = 0;
     width = 0;
 }
 
+// Copy constructor
 RGBImage::RGBImage(const RGBImage& img)
 {
     height = img.height;
@@ -25,6 +29,7 @@ RGBImage::RGBImage(const RGBImage& img)
     currentImage = img.currentImage;
 }
 
+// Constructor from a file
 RGBImage::RGBImage(std::istream& stream)
 {
     string word;
@@ -32,8 +37,6 @@ RGBImage::RGBImage(std::istream& stream)
     int counter = 0;
     int pixel_counter = 0;
     int red = 0, green = 0, blue = 0;
-
-    //Image& thisImage = currentImage;
 
     while(!stream.eof())
     {
@@ -58,7 +61,7 @@ RGBImage::RGBImage(std::istream& stream)
         }
         else    // it is the value of current pixel
         {
-            /* a way to add the value in each pixel, it works!*/
+            /* a way to add the value in each pixel */
 
             if(pixel_counter == 0)
             {
@@ -77,7 +80,6 @@ RGBImage::RGBImage(std::istream& stream)
                 currentImage[i][j].setRed(red);
                 currentImage[i][j].setGreen(green);
                 currentImage[i][j].setBlue(blue);
-                //pixel_counter = 0;
 
                 if(j == width - 1)
                 {
@@ -94,19 +96,17 @@ RGBImage::RGBImage(std::istream& stream)
                     j++;
                 }
             }
-
-            //value = stoi(word);
             if(pixel_counter == 2)
                 pixel_counter = 0;
             else
                 pixel_counter++;
 
         }
-        //cout << word << endl;
     }
     counter = 0;           
 }
 
+// Destructor
 RGBImage::~RGBImage()
 {
     for(int i = 0; i < height; i++)
@@ -121,6 +121,7 @@ RGBImage& RGBImage::operator = (const RGBImage& img)
     return *this;
 }
 
+// Rotate Image n times
 Image& RGBImage::operator += (int times)
 {
     for(int k = 0; k < times; k++)
@@ -154,20 +155,12 @@ Image& RGBImage::operator += (int times)
         }
         delete[] currentImage;
 
-        currentImage = newImage;
-
-        // for(int i = 0; i < width; i++)
-        // {
-        //     for (int j = 0; j < height; j++)
-        //     {
-        //         cout << to_string(currentImage[i][j].getValue()) << endl;
-        //     }
-        // }            
-
+        currentImage = newImage;         
     }
     return *this;
 } 
 
+// Resize image factor times, where 0 < factor <= 2.0
 Image& RGBImage::operator *= (double factor)
 {
     int old_width = width;
@@ -240,6 +233,7 @@ Image& RGBImage::operator *= (double factor)
     return *this;
 }
 
+// Convert Image to negative
 Image& RGBImage::operator !()
 {
     for(int i = 0; i < height; i++)
@@ -257,16 +251,7 @@ Image& RGBImage::operator !()
     return *this;
 } 
 
-// int clip(double value)
-// {
-//     if(value < 0)
-//         return 0;
-//     else if(value > 255)
-//         return 255;
-//     else
-//         return value;
-// }
-
+// Equalize the histogram of the image
 Image& RGBImage::operator ~()
 {
     int red_value, green_value, blue_value;
@@ -305,9 +290,7 @@ Image& RGBImage::operator ~()
 
     for(int i = 0; i <= max_luminocity; i++)
     {
-        //cout << "The array pos " << i << " is " << histogram_array[i] << endl;
         possibility_array[i] = (double)(histogram_array[i])/ (double)pixels_size;
-        //cout << "The possibility array pos " << i << " is " << possibility_array[i] << endl;
     }         
 
     for(int i = 0; i <= max_luminocity; i++)
@@ -319,17 +302,11 @@ Image& RGBImage::operator ~()
         }
         final_possibility_array[i] = possibility;
         possibility = 0;
-    }       
-
-    // for(int i = 0; i <= max_luminocity; i++)
-    // {
-    //     //cout << "The final possibility array pos " << i << " is " << final_possibility_array[i] << endl;
-    // }    
+    }        
 
     for(int i = 0; i <= max_luminocity; i++)
     {
         final_array[i] = (int) (235.0*final_possibility_array[i]);
-        //cout << "The array pos " << i << " is " << final_array[i] << endl;
     }
 
     for(int i = 0; i < height; i++)
@@ -379,6 +356,7 @@ Image& RGBImage::operator ~()
     return *this;
 }
 
+// reverse image to the vertical axis
 Image& RGBImage::operator *()
 {
     for(int i = 0; i < height; i++)
@@ -392,6 +370,7 @@ Image& RGBImage::operator *()
     return *this;
 }
 
+// method to return the specific Pixel
 Pixel& RGBImage::getPixel(int row, int col) const
 {
     return currentImage[row][col];

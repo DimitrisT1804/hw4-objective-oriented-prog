@@ -1,3 +1,5 @@
+/* Header File for Pixel class*/
+
 #ifndef pixel
 #define pixel
 

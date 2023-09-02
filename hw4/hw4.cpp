@@ -1,10 +1,8 @@
-// #include <iostream>
-// #include <fstream>
-#include <vector>
-// #include <string.h>
+/* Source File for main class from the program hw4 */
 
-// #include <math.h>
-// #include <algorithm>
+// #define PRINT_MENU
+
+#include <vector>
 #include "Image.hpp"
 #include "Token.hpp"
 #include "RGBImage.hpp"
@@ -13,6 +11,7 @@
 
 using namespace std;
 
+// method that reads file and creates GSCImage or RGBImage
 Image* readNetpbmImage(const char* filename)
 {
     ifstream f (filename);
@@ -40,6 +39,7 @@ Image* readNetpbmImage(const char* filename)
     return img_ptr;
 }
 
+// Method that checks if the token has the '$' as first symbol
 bool check_symbol(string Token_name)
 {
     if(Token_name[0] != '$')
@@ -49,6 +49,7 @@ bool check_symbol(string Token_name)
     return false;
 }
 
+// method that checks if the token exists already
 long unsigned int checkToken(string Token_name, vector <Token> array_token)
 {
     long unsigned int i;
@@ -62,43 +63,37 @@ long unsigned int checkToken(string Token_name, vector <Token> array_token)
 
 int main()
 {
-    //Image kati(100, 50);
     char selection = ' ';
     Image* currentImage;
     string out_file;
-    //Token **array = NULL;
-    //int array_size = 0;
     vector<Token> array_token;
     string token_name;
     string filename;
-    string as;  // just to ignore a character
-    string just_input;
+    string as;  // just to take the input word
+    string just_input; // just to take the input word
     long unsigned int array_pos = -1;
 
     double factor;
     int times = 0;
     int token_exists = 0;
 
-
-    //array = (Token **) malloc(sizeof(Token));
-    //array_size++;
-
     while (selection != 'q')
     {
-        // std::cout << "i <filename> as <$token>" << endl;
-        // std::cout << "e <$token> as <filename>" << endl;
-        // std::cout << "d <$token>" << endl;
-        // std::cout << "n <$token>" << endl;
-        // std::cout << "s <$token> by <factor>" << endl;
-        // std::cout << "r <$token> clockwise <X> times" << endl; 
-        // std::cout <<"m <$token>" << endl; 
+        #ifdef PRINT_MENU
+        std::cout << "i <filename> as <$token>" << endl;
+        std::cout << "e <$token> as <filename>" << endl;
+        std::cout << "d <$token>" << endl;
+        std::cout << "n <$token>" << endl;
+        std::cout << "s <$token> by <factor>" << endl;
+        std::cout << "r <$token> clockwise <X> times" << endl; 
+        std::cout <<"m <$token>" << endl; 
+        #endif
+
         std::cin >> selection;
-        //cout << "selection is " << selection << endl;
         if(!isalpha(selection))
         {
             return -1;      // it is not alphabetic input
         }
-        // std::cin.ignore();
 
         switch(selection)
         {
@@ -115,10 +110,6 @@ int main()
                 }
 
                 currentImage = readNetpbmImage(filename.c_str());
-                //printf("width is %d \nheight is %d \nmaxLuminocity is %d \n", currentImage->getWidth(), currentImage->getHeight(), currentImage->getMaxLuminocity());
-
-                //array = (Token *) realloc(array, array_size*sizeof(Token));
-                //Token* Image_token = new Token("kati", currentImage);
 
                 /*New version for array*/
                 if(check_symbol(token_name))
@@ -185,18 +176,7 @@ int main()
                         cin >> out_file;
                         break;
                     }
-                    // for(int i = 0; i < currentImage->getWidth(); i++)
-                    // {
-                    //     for (int j = 0; j < currentImage->getHeight(); j++)
-                    //     {
-                    //         printf("Pixel is: %d\n", currentImage->getPixel(i, j).pixel_value);
-                    //     }
-                    // }
 
-                    // Generate the output file with pgm format
-                    //std::cin.ignore(256, '\n');
-                    //std::cin >> out_file;
-                    //getline(cin, out_file);
                     ifstream ifile(out_file.c_str());
                     
                     if(ifile.good())
@@ -209,31 +189,13 @@ int main()
                         ofstream myfile(out_file);
                         if(!myfile.is_open())
                         {
-                            //cout << "Unable to open file " << out_file;
                             cout << "[ERROR] Unable to create file" << endl;
                         }
                         else
                         {
-                            // myfile << "P2" << endl;
-                            // myfile << to_string(currentImage->getWidth()) << " ";
-                            // myfile << to_string(currentImage->getHeight()) << " ";
-                            // myfile << to_string(currentImage->getMaxLuminocity()) << endl;
-
-                            // for(int i = 0; i < currentImage->getHeight(); i++)
-                            // {
-                            //     for (int j = 0; j < currentImage->getWidth(); j++)
-                            //     {
-                            //         myfile << to_string(GSC->currentImage[i][j].getValue()) << endl;
-                            //     }
-                            // }
-                            // cout << "[OK] Export " << token_name << endl;
-
                             GSCImage* check_image = dynamic_cast<GSCImage*>(currentImage);
                             if(check_image)
                             {
-                                //cout << "It is of GSC Image!" << endl;
-                                //myfile << *currentImage << endl;
-
                                 myfile << "P2" << endl;
                                 myfile << to_string(currentImage->getWidth()) << " ";
                                 myfile << to_string(currentImage->getHeight()) << " ";
@@ -247,11 +209,8 @@ int main()
                                     }
                                 }
                                 cout << "[OK] Export " << token_name << endl;
-                                //cout << "[OK] Export " << token_name << endl;
                                 break;
                             }
-                            
-                            //cout << "It is of RGB Image!" << endl;
 
                             myfile << "P3" << endl;
                             myfile << to_string(currentImage->getWidth()) << " ";
@@ -263,22 +222,17 @@ int main()
                             {
                                 for (int j = 0; j < currentImage->getWidth(); j++)
                                 {
-                                    //out << to_string(currentImage->mycurrentImage->i][j].pixel_value) << endl;
                                     myfile << to_string (currentImage->getPixel(i, j).red) << " ";
                                     myfile << to_string (currentImage->getPixel(i, j).green) << " ";
                                     myfile << to_string (currentImage->getPixel(i, j).blue) << endl;
                                 }
                             }
-
-                            //myfile << *currentImage << endl;
                             cout << "[OK] Export " << token_name << endl;
 
                         }
 
                     }
-
                 }
-
                 break;
 
             }
@@ -314,7 +268,6 @@ int main()
 
                 currentImage = array_token[array_pos].getPtr();
 
-                //currentImage->operator!();
                 (*currentImage) = !(*currentImage);
 
                 std::cout << "[OK] Color Inversion " << token_name << endl;
@@ -342,7 +295,6 @@ int main()
 
                 currentImage = array_token[array_pos].getPtr();
 
-                //(*currentImage) *= factor;
                 *currentImage = (*currentImage) *= factor;
 
                 cout << "[OK] Scale " << token_name << endl;
@@ -387,7 +339,6 @@ int main()
 
                 currentImage = array_token[array_pos].getPtr();
 
-                //(*currentImage) *= factor;
                 *currentImage = (*currentImage) += times;   
 
                 cout << "[OK] Rotate " << token_name << endl;     
@@ -438,7 +389,6 @@ int main()
 
                 RGBImage& rgbRef = *rgbPointer; 
 
-                // GSCImage *convert_image = new GSCImage(static_cast<RGBImage&>(*array_token[array_pos].getPtr()));
                 GSCImage *convert_image = new GSCImage(rgbRef);
 
                 delete rgbPointer;      // delete previous object with RGB image
@@ -488,18 +438,14 @@ int main()
         {
             delete (RGBImage*) array_token[i].getPtr();
         }
-        //delete array_token[i].getPtr();
-        // array_token.erase(array_token.begin()+i);
     }
 
     for (int i = 0; i < token_size; i++)
     {
         array_token.erase(array_token.begin()+i);
     }
-    
 
-    return 0;
-
+    return 0;   // normaly exits main()
 }
 
 

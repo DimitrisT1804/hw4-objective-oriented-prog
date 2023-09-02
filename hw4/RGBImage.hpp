@@ -1,3 +1,5 @@
+/* Header File for RGBImage class*/
+
 #ifndef RGBIMAGE_H
 #define RGBIMAGE_H
 

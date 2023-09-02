@@ -1,4 +1,6 @@
-#ifndef RGBPIXEL_H
+/* Header File for RGBPixel class*/
+
+#ifndef RGBPIXEL_H  // File guards to avoid multiple definitions
 #define RGBPIXEL_H
 
 #include "pixel.hpp"
@@ -22,7 +24,5 @@ class RGBPixel : public Pixel
         void setGreen(int g);
 
         void setBlue(int b);
-
-        //char red = ' ', green = ' ', blue = ' ';      // i keep in each byte the colors
 };
 #endif

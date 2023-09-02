@@ -1,3 +1,5 @@
+/* Source File for Token class */
+
 #include "Token.hpp"
 
 Token::Token(const string& token_name, Image* image_ptr)
